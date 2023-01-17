@@ -5,3 +5,5 @@ I've already used AI-Platform wrt production condition.
 
 Concerning Vertex AI, I aim to test different ways to use it and see differences with the use of AI-Platform
 
+##Status
+Work In Progress
