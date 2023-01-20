@@ -1,9 +1,11 @@
 """
 This script contains model to be trained
 """
+import argparse
 import os
 import logging
 import warnings
+import json
 import pickle
 
 import numpy as np
@@ -11,6 +13,9 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error as mse
+
+import google.auth as ga
+from google.oauth2 import service_account
 
 # custom modules
 from gcp_interface.storage_interface import StorageInterface
@@ -34,6 +39,7 @@ def get_data_from_storage(gs_interface: StorageInterface,
                                              data_name=data_name,
                                              gs_dir_path=gs_dir_path)
     data.dropna(inplace=True)
+    # data['product_code'] = data['product_code'].astype('int32').astype('str')
     return data
 
 
@@ -187,3 +193,54 @@ def predict_in_local(gs_interface: StorageInterface,
         bucket_name=bucket_name,
         data_name="prediction_" + predict_name,
         gs_dir_path=gs_dir_path)
+
+
+if __name__ == '__main__':
+    # parse all given arguments
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('--project_name', required=True, type=str)
+    parser.add_argument('--configuration', required=True, type=str)
+    parser.add_argument('--data_name', required=True, type=str)
+    parser.add_argument('--task', required=True, type=str)
+    parser.add_argument('--data_configuration', required=True, type=str)
+    parser.add_argument('--model_name', required=True, type=str)
+
+    args = parser.parse_args()
+
+    logger.info(f'READY to launch {args.task} task in the cloud')
+    # inverse operation : turns a string-ified dictionary to an actual dictionary
+    infra_config = json.loads(args.configuration)
+    data_config = json.loads(args.data_configuration)
+    # retrieve credentials
+    if infra_config['google_cloud']['credentials_json_file'] != "":
+        credentials = service_account.Credentials.from_service_account_file(
+            infra_config['google_cloud']['credentials_json_file'])
+    else:
+        credentials, _ = ga.default()
+
+    # instantiate a GS interface
+    storage_interface = StorageInterface(
+        project_name=args.project_name,
+        credentials=credentials)
+
+    if args.task == 'train':
+        train_model_in_local(
+            gs_interface=storage_interface,
+            gs_dir_path=infra_config['google_gcs'].get('directory_name'),
+            bucket_name=infra_config['google_gcs'].get('bucket_name'),
+            local_dir_path=infra_config.get('local_dir_path', "tmp"),
+            train_name=args.data_name,
+            data_configuration=data_config,
+            model_name=args.model_name
+        )
+    elif args.task == 'predict':
+        predict_in_local(
+            gs_interface=storage_interface,
+            gs_dir_path=infra_config['google_gcs'].get('directory_name'),
+            bucket_name=infra_config['google_gcs'].get('bucket_name'),
+            local_dir_path=infra_config.get('local_dir_path', "tmp"),
+            predict_name=args.data_name,
+            data_configuration=data_config,
+            model_name=args.model_name
+        )

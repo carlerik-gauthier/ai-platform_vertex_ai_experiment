@@ -1,5 +1,13 @@
 google_cloud:
   credentials_json_file: ""
+  vertex_ai_location: "training_job_location"
+
+vertex_ai:
+  location: "training_job_location"
+  training_pre_built_container: 'training_pre_built_container_image'
+  serving_pre_built_container: 'serving_pre_built_container_image'
+  # https://cloud.google.com/vertex-ai/docs/training/pre-built-containers
+  # https://cloud.google.com/vertex-ai/docs/predictions/pre-built-containers
 
 google_gcs:
   bucket_name: "storage_bucket_name"

@@ -1,0 +1,14 @@
+venv
+
+**/*.egg-info
+
+**/dist
+package
+**/build
+
+artifact
+docker
+
+src/test.py
+
+**/__pycache__
