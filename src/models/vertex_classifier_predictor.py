@@ -3,7 +3,6 @@ from typing import List, Union
 from google.cloud import aiplatform
 from vertex_ai_experiment.models import make_batch_prediction_job
 
-
 # run on endpoint : general overview
 # https://github.com/googleapis/python-aiplatform/blob/main/samples/snippets/prediction_service/predict_custom_trained_model_sample.py
 def get_predict_from_endpoint(

@@ -69,6 +69,7 @@ def get_custom_job_model(dataset: aiplatform.TabularDataset,
 
 
 def create_training_pipeline_custom_package_job_sample(
+        dataset: aiplatform.TabularDataset,
         project: str,
         location: str,
         staging_bucket: str,
@@ -77,7 +78,6 @@ def create_training_pipeline_custom_package_job_sample(
         python_module_name: str,
         container_uri: str,
         model_serving_container_image_uri: str,
-        dataset_id: Optional[str] = None,
         model_display_name: Optional[str] = None,
         args: Optional[List[Union[str, float, int]]] = None,
         replica_count: int = 1,
@@ -88,9 +88,16 @@ def create_training_pipeline_custom_package_job_sample(
         validation_fraction_split: float = 0.1,
         test_fraction_split: float = 0.1,
         sync: bool = True):
+    # https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/sdk/SDK_Custom_Training_Python_Package_Managed_Text_Dataset_Tensorflow_Serving_Container.ipynb
+    # https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/SDK_Custom_Container_Prediction.ipynb
+
     # https://cloud.google.com/vertex-ai/docs/training/create-training-pipeline
     # https://cloud.google.com/vertex-ai/docs/training/create-training-pipeline#aiplatform_create_training_pipeline_custom_job_sample-python
-
+    # https://cloud.google.com/python/docs/reference/aiplatform/latest/google.cloud.aiplatform.CustomPythonPackageTrainingJob
+    # https://cloud.google.com/artifact-registry/docs/python/manage-packages#gcloud
+    # https://towardsdatascience.com/if-you-are-using-python-and-google-cloud-platform-this-will-simplify-life-for-you-part-2-bef56354fd4c
+    # https://d-tresoldi5.medium.com/how-to-build-a-python-package-with-cloud-build-in-gcp-777c6adca5c9
+    # https://dev.to/koshilife/manage-private-python-packages-using-artifact-registry-google-cloud-30kh
     init_pipeline(project=project,
                   location=location,
                   staging_bucket=staging_bucket)
@@ -103,8 +110,6 @@ def create_training_pipeline_custom_package_job_sample(
         model_serving_container_image_uri=model_serving_container_image_uri,
     )
 
-    dataset = aiplatform.ImageDataset(dataset_id) if dataset_id else None
-
     model = job.run(
         dataset=dataset,
         model_display_name=model_display_name,
@@ -116,7 +121,7 @@ def create_training_pipeline_custom_package_job_sample(
         training_fraction_split=training_fraction_split,
         validation_fraction_split=validation_fraction_split,
         test_fraction_split=test_fraction_split,
-        sync=sync,
+        sync=sync
     )
 
     model.wait()

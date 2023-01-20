@@ -9,6 +9,10 @@ le v3 customPythonPackageJob
 le v4 le full custom
 
 # Objectif
+https://cloud.google.com/python/docs/reference/aiplatform/latest/google.cloud.aiplatform
+https://cloud.google.com/artifact-registry/docs/python/manage-packages#gcloud
+https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/SDK_Custom_Container_Prediction.ipynb
+
 
 Le but est de fournir un template de code permettant de lancer un entraînement de modèle ML avec Vertex AI en utilisant
 des images pre-built. L'approche "easy" est montrée
@@ -44,22 +48,21 @@ Il n'y a pas d'optimisation du modèle de prédiction de survie. Il est juste l�
 https://cloud.google.com/vertex-ai/docs/predictions/custom-prediction-routines
 https://github.com/googleapis/python-aiplatform/tree/custom-prediction-routine/google/cloud/aiplatform/prediction
 https://github.com/GoogleCloudPlatform/mlops-on-gcp/blob/master/on_demand/kfp-caip-sklearn/lab-01-caip-containers/lab-01.ipynb
-https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/prediction/custom_prediction_routines/SDK_Custom_Predict_and_Handler_SDK_Integration.ipynb
 https://codelabs.developers.google.com/vertex-cpr-sklearn#5
 https://stackoverflow.com/questions/35153902/find-the-list-of-google-container-registry-public-images
 https://blog.searce.com/deploy-your-own-custom-ml-on-vertex-ai-using-gcp-console-e3c52f7da2b
 https://cloud.google.com/vertex-ai/docs/training/create-custom-container
-
+https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/prediction/custom_prediction_routines/SDK_Custom_Predict_and_Handler_SDK_Integration.ipynb
 https://blog.ml6.eu/vertex-ai-is-all-you-need-599ffc9473fd
 https://towardsdatascience.com/how-to-set-up-custom-vertex-ai-pipelines-step-by-step-467487f81cad
 https://supertype.ai/notes/deploying-machine-learning-models-with-vertex-ai-on-google-cloud-platform/
+https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/SDK_Custom_Container_Prediction.ipynb
 BELOW : might change
 
 dataset management
 https://cloud.google.com/vertex-ai/docs/training/using-managed-datasets#sentiment-analysis
-https://github.com/GoogleCloudPlatform/cloudml-samples/blob/main/notebooks/scikit-learn/custom-pipeline.ipynb
 
-# Vertex AI avec des images pre-built : approche la plus simple
+# Vertex AI avec des images pre-built ET des CustomPythonPackageTrainingJob
 
 ## 1. La data dans Storage, why ? 
 ## 2. Entraîner le modèle et sauver le modèle dans Storage depuis le local
@@ -164,3 +167,22 @@ Pour une prédiction avec l'Endpoint, il faut procéder aux étapes suivantes :
 
 # Pricing 
 https://cloud.google.com/vertex-ai/pricing#europe
+
+
+# NEW STEPS 
+pip install --upgrade pip setuptools wheel
+pip install twine keyrings.google-artifactregistry-auth
+
+
+### create a python repository if wanted
+gcloud artifacts repositories create <your_repository_name> --repository-format=python 
+--location=<your_repository_location>
+--description="<your_repository_description>"
+
+### build the package
+python setup.py bdist_wheel
+
+cp dist/{package_name}-{package_version}-py3-none-any.whl ../package/
+
+### Deploy the sample python package to artifact registry (dist has to be a subfolder from current position)
+twine upload --repository-url https://<your_repository_location>-python.pkg.dev/<your_gcp_project>/<your_repository_name>/ dist/*

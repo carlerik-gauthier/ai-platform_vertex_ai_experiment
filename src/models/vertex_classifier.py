@@ -26,8 +26,7 @@ from google.cloud import storage
 # from gcp_interface.storage_interface import StorageInterface
 # from preprocessing.titanic_preprocess import preprocess
 
-# NB : It is necessary to move custom preprocess module content here. Otherwise see
-# https://github.com/GoogleCloudPlatform/cloudml-samples/blob/main/notebooks/scikit-learn/custom-pipeline.ipynb
+#TODO : move preprocess module content here
 
 warnings.filterwarnings("ignore", """Your application has authenticated using
 end user credentials""")

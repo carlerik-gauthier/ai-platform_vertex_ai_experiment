@@ -29,7 +29,7 @@ from gcp_interface.ml_job import get_job_id, get_job_body, is_success, \
 from models.classifier import train_model_in_local, predict_in_local
 from models.vertex_classifier_predictor import get_predict_from_endpoint, get_batch_prediction
 from vertex_ai_experiment.models import get_endpoint_ids, get_model_ids
-
+from constants import PACKAGE_NAME, VERSION
 warnings.filterwarnings("ignore", """Your application has authenticated using
 end user credentials""")
 
@@ -128,14 +128,15 @@ if __name__ == '__main__':
                               ]
 
             arguments = reduce(lambda v, w: v + w, arguments_part)
-            """
+
             # collect package
             logger.info(
                 'Checking if packages needed by ML engine are available')
 
             packages = {
-                p: 'gs://{bucket_name}/ai_platform_template_dir/package/{package}'.format(
+                p: 'gs://{bucket_name}/{gs_dir}/package/{package}'.format(
                     bucket_name=bucket_name,
+                    gs_dir=titanic_dir,
                     package=p
                 ) for p in os.listdir(os.path.join(project_dir_path,
                                                    'package')
@@ -150,19 +151,14 @@ if __name__ == '__main__':
                                                  )
 
             # setting ML engine machine
-            """
 
-            logger.info(" Start custom training job with pre-built images")
+            logger.info(" Start custom training job with custom python package")
             timestamp = time.strftime("%Y%m%d")  # time.strftime("%Y%m%d_%H%M%S")
             model_display_name = f'{model_display_name_prefix}_{timestamp}'
-            script_path = "models/vertex_classifier.py"
-            # for f in os.listdir("/home/carl-erikgauthier/PycharmProjects/template-ai-platform/src"):
-            #     print(f)
+            python_module = "models.vertex_custom_python_classifier"
 
             path = os.path.abspath(__file__)
             dir_name = os.path.dirname(path)
-            with open('vertex_ai_reqs.txt', 'r') as ff:
-                vertex_ai_requirements = ff.read()
 
             # create Tabular if it doesn't exist else fetch it
             logger.info("A. Vertex Dataset stage")
@@ -184,27 +180,24 @@ if __name__ == '__main__':
                                                                 location=vertex_ai_location,
                                                                 credentials=credentials)
             logger.info("B. Vertex Model stage")
-            model = vertex_jobs.get_custom_job_model(
+            package_core_name = f'{PACKAGE_NAME}-{VERSION}'
+            admissible_packages_keys = [k for k in packages.keys() if k.startswith(package_core_name)]
+            assert len(admissible_packages_keys) > 0
+            python_package_gcs_uri = packages.get(admissible_packages_keys[0])
+            model = vertex_jobs.create_training_pipeline_custom_package_job_sample(
                 dataset=dataset,
                 project=project_name,
                 location=vertex_ai_location,
-                bucket=os.path.join(bucket_name, titanic_dir, 'vertex_exp'),
+                staging_bucket=os.path.join(bucket_name, titanic_dir, 'vertex_exp', 'jobs'),
                 display_name=model_display_name,
-                script_path=script_path,
-                script_args=arguments,
+                model_display_name=model_display_name,
+                python_package_gcs_uri=python_package_gcs_uri,
+                python_module_name=python_module,
+                args=arguments,
                 container_uri=container_uri,
-                requirements=vertex_ai_requirements.split("\n"),
                 model_serving_container_image_uri=model_serving_container_image_uri,
                 replica_count=1,
              )
-            # logger.info("C. Upload model") # seems to be useless
-            # model_upload = vertex_model.upload_model(
-            #    serving_container_image_uri=model_serving_container_image_uri,
-            #    artifact_uri=model.uri,  # .replace("model", ""),
-            #    display_name=model_display_name_prefix,
-            #    project=project_name,
-            #    location=vertex_ai_location,
-            #    credentials=credentials)
 
             logger.info("D. Creating Endpoint")
             endpoint_display_name = f'endpoint_{model_display_name_prefix}_version_{model.version_id}'
@@ -244,7 +237,7 @@ if __name__ == '__main__':
                 gs_interface.dataframe_to_storage(df=prediction_data,
                                                   bucket_name=bucket_name,
                                                   gs_dir_path=titanic_dir,
-                                                  data_name="prediction_titanic_vertex_ai_v1_endpoint.csv")
+                                                  data_name="prediction_titanic_vertex_ai_v3_endpoint.csv")
 
             """
            # Only for informational purpose
