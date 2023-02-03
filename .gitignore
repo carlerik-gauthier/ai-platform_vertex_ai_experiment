@@ -1,0 +1,12 @@
+venv
+
+**/*.egg-info
+
+**/dist
+package
+**/build
+
+artifact/push_image_to_artifact.sh
+artifact/cloudbuild.yaml
+
+src/test.py
