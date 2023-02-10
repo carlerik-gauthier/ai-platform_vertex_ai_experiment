@@ -12,7 +12,7 @@ import vertex_ai_experiment.models as vertex_model
 import vertex_ai_experiment.datasets as vertex_dataset
 import vertex_ai_experiment.containers as containers
 from datetime import datetime
-from functools import reduce
+# from functools import reduce
 from copy import deepcopy
 
 # Google related packages
@@ -27,6 +27,7 @@ from cpr_dir.gcp_interface.storage_interface import StorageInterface
 from cpr_dir.models.vertex_classifier_predictor import get_predict_from_endpoint
 from vertex_ai_experiment.models import get_endpoint_ids
 
+# from vertex_ai_experiment.predictor import CprPredictor
 
 warnings.filterwarnings("ignore", """Your application has authenticated using
 end user credentials""")
@@ -70,6 +71,9 @@ if __name__ == '__main__':
     # retrieve infrastructure data and functional parameters
     with open(args.configuration, 'r') as f:
         config = yaml.safe_load(f)
+
+    # global_cfg = get_global_config(project_account=project_account,
+    #                                test_mode=args.test_mode == '1')
 
     # retrieve credentials
     if config['google_cloud']['credentials_json_file'] != "":
@@ -115,16 +119,16 @@ if __name__ == '__main__':
         model_artifact_uri = f"gs://{bucket_name}/{titanic_dir}/cpr_model_artifact"
         if args.task == 'train':
             logger.info(" TRAINING ")
-            arguments_part = [['--project_name', project_name],
-                              ['--configuration', config_arg],
-                              ['--data_name', data_name],
-                              ['--task', args.task],
-                              ['--data_configuration', data_arg],
-                              ['--model_name', model_name],
-                              ['--model_artifact_gs_dir', model_artifact_uri]
-                              ]
+            # arguments_part = [['--project_name', project_name],
+            #                  ['--configuration', config_arg],
+            #                  ['--data_name', data_name],
+            #                  ['--task', args.task],
+            #                  ['--data_configuration', data_arg],
+            #                  ['--model_name', model_name],
+            #                  ['--model_artifact_gs_dir', model_artifact_uri]
+            #                  ]
 
-            arguments = reduce(lambda v, w: v + w, arguments_part)
+            # arguments = reduce(lambda v, w: v + w, arguments_part)
 
             logger.info(" Start custom training job with pre-built images")
             timestamp = time.strftime("%Y%m%d")  # time.strftime("%Y%m%d_%H%M%S")
@@ -209,12 +213,14 @@ if __name__ == '__main__':
                 project_id = endpoint.get('ressource_name').split('/')[1]
                 # run endpoint prediction
                 logger.info("C-endpoint prediction: Compute")
+                # took less than 1 second for 87 predictions
                 prediction_data['survival_prediction'] = get_predict_from_endpoint(
                     project=project_id,
                     endpoint_id=endpoint.get('name'),
                     location=vertex_ai_location,
                     instances=[list(r) for r in prediction_data.values]
                     )
+                # instances={f'instance_key_{i+1}': r[i] for i in range(len(r))}
 
                 logger.info("D-endpoint prediction: Push prediction to Storage")
                 gs_interface.dataframe_to_storage(df=prediction_data,
