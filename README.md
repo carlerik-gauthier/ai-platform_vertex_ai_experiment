@@ -44,10 +44,6 @@ devra y être déposée.
 
 À noter également que le modèle ML/DL entraînée sera également sauvegardé dans ce directory.
 
-Pour cet exemple, le bucket est *dmp-y-test-bucket* et le directory de ce projet est 
-*ai_platform_template_dir*.
-
-
 # 2. Entraîner le modèle et sauver le modèle dans Storage depuis le local
 ### A. L'interface principal
 Avant toute opération, il est important de tester les tâches destinées au cloud en local et dans un environnement 
