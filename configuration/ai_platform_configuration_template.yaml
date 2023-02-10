@@ -3,8 +3,9 @@ google_cloud:
   vertex_ai_location: "training_job_location"
 
 vertex_ai:
-  location: "training_job_location"
-  training_pre_built_container: 'training_pre_built_container_image'
+  location: "training job location. It cannot be multi-regional"
+  repository: "repository name in Artifact Registry where the image is going to be located"
+  image: "name to give to the training Docker image"
   serving_pre_built_container: 'serving_pre_built_container_image'
   # https://cloud.google.com/vertex-ai/docs/training/pre-built-containers
   # https://cloud.google.com/vertex-ai/docs/predictions/pre-built-containers

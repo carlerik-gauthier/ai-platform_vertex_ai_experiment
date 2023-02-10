@@ -138,9 +138,10 @@ if __name__ == '__main__':
 
             arguments = reduce(lambda v, w: v + w, arguments_part)
 
-            logger.info(" Start custom training job with pre-built images")
+            logger.info(" Start training job with custom images")
             timestamp = time.strftime("%Y%m%d")  # time.strftime("%Y%m%d_%H%M%S")
             model_display_name = f'{model_display_name_prefix}_{timestamp}'
+            script_path = "models/vertex_classifier.py"
 
             # create Tabular if it doesn't exist else fetch it
             logger.info("A. Vertex Dataset stage")
@@ -174,6 +175,14 @@ if __name__ == '__main__':
                 model_serving_container_image_uri=model_serving_container_image_uri,
                 replica_count=1,
              )
+            # logger.info("C. Upload model") # seems to be useless
+            # model_upload = vertex_model.upload_model(
+            #    serving_container_image_uri=model_serving_container_image_uri,
+            #    artifact_uri=model.uri,  # .replace("model", ""),
+            #    display_name=model_display_name_prefix,
+            #    project=project_name,
+            #    location=vertex_ai_location,
+            #    credentials=credentials)
 
             logger.info("D. Creating Endpoint")
             endpoint_display_name = f'cs_img_endpoint_{model_display_name_prefix}_version_{model.version_id}'
@@ -213,7 +222,7 @@ if __name__ == '__main__':
                 gs_interface.dataframe_to_storage(df=prediction_data,
                                                   bucket_name=bucket_name,
                                                   gs_dir_path=titanic_dir,
-                                                  data_name="prediction_titanic_vertex_ai_v3_endpoint.csv")
+                                                  data_name="prediction_titanic_vertex_ai_v4_endpoint.csv")
 
             """
            # Only for informational purpose
