@@ -1,17 +1,28 @@
-# TODO :
-- deployment + prediction (batch?)
-- Preprocessing before or during prediction steps
-- CustomPythonPackageTrainingJob
-- full custom : avec création d'une propre image docker à push sur registry
+# Vertex AI avec des images pre-built : approche la plus simple
 
-v1 l'actuel, le v2 selon predict preprocess
-le v3 customPythonPackageJob
-le v4 le full custom
+# Documentation 
+- https://cloud.google.com/docs?hl=fr
+- https://cloud.google.com/vertex-ai/docs/training/custom-training
+- https://cloud.google.com/vertex-ai/docs/training/create-python-pre-built-container
+- https://cloud.google.com/vertex-ai/docs/training/create-custom-job#create_custom_job-python 
+- https://cloud.google.com/vertex-ai/docs/training/create-training-pipeline#script 
+- https://cloud.google.com/vertex-ai/docs/training/pre-built-containers
+- https://cloud.google.com/vertex-ai/docs/predictions/pre-built-containers?hl=fr
+
+- google-cloud-aiplatform : https://github.com/googleapis/python-aiplatform/
+- https://cloud.google.com/python/docs/reference/aiplatform/latest#google.cloud.aiplatform.CustomContainerTrainingJob
+- https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_custom_image_classification_online_explain.ipynb
+- https://cloud.google.com/vertex-ai/docs/tutorials/tabular-bq-prediction/create-training-script?hl=fr
+
+other
+- https://cloud.google.com/vertex-ai/docs/start/ai-platform-users
+- https://cloud.google.com/vertex-ai/docs/training/code-requirements
+- https://cloud.google.com/vertex-ai/docs/predictions/custom-container-requirements
+- https://cloud.google.com/vertex-ai/docs/start/migrating-to-vertex-ai?hl=fr#migration-info
 
 # Objectif
-
 Le but est de fournir un template de code permettant de lancer un entraînement de modèle ML avec Vertex AI en utilisant
-des images pre-built. L'approche "easy" est montrée
+des images pre-built. L'approche "easy" est montrée.
 
 # Data
 Pour ce template, nous utilisons le jeu de données 'Titanic dataset' disponible sur Kaggle.
@@ -19,148 +30,115 @@ Pour ce template, nous utilisons le jeu de données 'Titanic dataset' disponible
 Il n'y a pas d'optimisation du modèle de prédiction de survie. Il est juste là pour illustrer.
 
 # Steps
-- https://cloud.google.com/artifact-registry/docs/repositories/create-repos?hl=fr#gcloud
-- https://cloud.google.com/vertex-ai/docs/start/ai-platform-users 
-- https://cloud.google.com/vertex-ai/docs/predictions/custom-prediction-routines
-- https://cloud.google.com/vertex-ai/docs/training/create-python-pre-built-container
-- https://cloud.google.com/vertex-ai/docs/training/create-custom-job#create_custom_job-python THIS ONE
-- https://cloud.google.com/vertex-ai/docs/training/create-training-pipeline THIS ONE TOO
-- https://cloud.google.com/vertex-ai/docs/training/pre-built-containers
-- https://cloud.google.com/vertex-ai/docs/training/custom-training
-- https://cloud.google.com/vertex-ai/docs/training/code-requirements
-- https://cloud.google.com/vertex-ai/docs/start/migrating-applications?hl=fr
-- https://cloud.google.com/vertex-ai/docs/start/migrating-to-vertex-ai?hl=fr#ai-platform
-- https://cloud.google.com/vertex-ai/docs/start/client-libraries
---> pip install google-cloud-aiplatform // https://github.com/googleapis/python-aiplatform/ HERE
-- https://cloud.google.com/vertex-ai/docs/predictions/use-custom-container#aiplatform_upload_model_highlight_container-python and HERE
-- https://www.youtube.com/watch?v=VRQXIiNLdAk&t=516s THIS ONE
-- https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/bigquery_ml/bqml-online-prediction.ipynb?utm_medium=email&utm_source=burgersandfries&utm_campaign=VertexAItoBQ4&utm_content=en
-- https://cloud.google.com/blog/topics/developers-practitioners/using-vertex-ai-rapid-model-prototyping-and-deployment?hl=en
-- https://codelabs.developers.google.com/vertex-pipelines-intro#0
-- https://cloud.google.com/vertex-ai/docs/predictions/custom-prediction-routines 
-- https://medium.com/google-cloud/how-to-train-ml-models-with-vertex-ai-training-f9046bfbcfab 
-- https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_custom_image_classification_online_explain.ipynb
-
-https://cloud.google.com/vertex-ai/docs/predictions/custom-prediction-routines
-https://github.com/googleapis/python-aiplatform/tree/custom-prediction-routine/google/cloud/aiplatform/prediction
-https://github.com/GoogleCloudPlatform/mlops-on-gcp/blob/master/on_demand/kfp-caip-sklearn/lab-01-caip-containers/lab-01.ipynb
-https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/prediction/custom_prediction_routines/SDK_Custom_Predict_and_Handler_SDK_Integration.ipynb
-https://codelabs.developers.google.com/vertex-cpr-sklearn#5
-https://stackoverflow.com/questions/35153902/find-the-list-of-google-container-registry-public-images
-https://blog.searce.com/deploy-your-own-custom-ml-on-vertex-ai-using-gcp-console-e3c52f7da2b
-https://cloud.google.com/vertex-ai/docs/training/create-custom-container
-
-https://blog.ml6.eu/vertex-ai-is-all-you-need-599ffc9473fd
-https://towardsdatascience.com/how-to-set-up-custom-vertex-ai-pipelines-step-by-step-467487f81cad
-https://supertype.ai/notes/deploying-machine-learning-models-with-vertex-ai-on-google-cloud-platform/
-BELOW : might change
-
-dataset management
-https://cloud.google.com/vertex-ai/docs/training/using-managed-datasets#sentiment-analysis
-https://github.com/GoogleCloudPlatform/cloudml-samples/blob/main/notebooks/scikit-learn/custom-pipeline.ipynb
-
-# Vertex AI avec des images pre-built : approche la plus simple
-
-## 1. La data dans Storage, why ? 
-## 2. Entraîner le modèle et sauver le modèle dans Storage depuis le local
-## 3. Packaging
-## 4. Faire une opération avec AI-Platform
+## 1. Principes
+## 2. Ce qui change avec AI-Platform
+## 3. Entraîner et prédire
 
 # Pré-requis
-**0.** Activer les APIs Vertex AI et Artifact Registry
+**0.** Activer les APIs Vertex AI : https://cloud.google.com/vertex-ai/docs/start/client-libraries
 
-**A.** Avoir les credentials GCP; en particulier pour Storage.  
+**A.** Avoir les credentials GCP; en particulier pour Storage.  S'assurer que l'emplacement du bucket utilisé est 
+de type **Region**. En effet, Vertex AI n'admet pas l'utilisation d'un type "Multi-region" car il gère l'infrastructure.
 
 **B.** Dans les arguments du main.py, définir une variable qui permet de savoir s'il faut lancer les calculs avec 
 Vertex AI ou le faire en local. Par ailleurs, il existe une notion de version pour l'endpoint
 
 Ici, ces arguments s'appellent env et endpoint_version.
 
-# 1. La data dans Storage, why ? 
-### A. Why ?
-Il est important de rappeler que les machines AI-Platform ont des droits GCP liés aux credentials utilisés pour les 
-jobs sur la AI-Platform.
-
-Pour des mesures de sécurité, elles n'ont pas de droits d'écritures sur BigQuery.
-
-Suivant les règles édictées par Google, il est préfèrable d'interagir **uniquement** avec Google Storage : 
-- *input rules :* https://cloud.google.com/ai-platform/training/docs/overview#input_data
-- *output rules :* https://cloud.google.com/ai-platform/training/docs/overview#output_data
-
-### B. Setup
-Avant de commencer les manipulations de la Data, il est nécessaire, pour plus de clarté, de créer un directory 
-dans le bucket Storage dédié. La donnée qui devra être consommée par la tâche exécutée au sein de la AI-Platform
-devra y être déposée.
-
-À noter également que le modèle ML/DL entraînée sera également sauvegardé dans ce directory.
-
-Pour cet exemple, le bucket est *dmp-y-test-bucket* et le directory de ce projet est 
-*ai_platform_template_dir*.
-
-
-# 2. Entraîner le modèle et sauver le modèle dans Storage depuis le local
-### A. L'interface principal
-Avant toute opération, il est important de tester les tâches destinées au cloud en local et dans un environnement 
-virtuel propre, i.e. qui ne contient que les librairies spécifiée dans requirements.txt, et les dépendances nécessaires.
-Pour cela, l'argument env doit être 'local' lors de l'exécution de l'interface principale qu'est src/main.py .
-
-Ainsi, la ligne de commande est 
-```
-python3 {CODE_PATH}/src/main.py --task {TASK} --config {PATH_TO_CONFIGURATION_FILE} --env local
-```
-
-Dans cet exemple, il y a 2 tâches : train & predict.
-
-La première vérification est de s'assurer que le code ne crashe pas.
-
-Une fois certain que le code fonctionne et dans le cadre de tâches où de la data transformée ou un modèle doit être 
-produit en output, vérifier que l'output se trouve bien là il est supposé être.
-
-### B. L'exécutable lancée pour l'entraînement du modèle
-Il s'agit du fichier qui sera lancée par la AI-Platform. Il est le point d'entrée pour les opérations de calculs à faire 
-dans le Cloud. Lors de calculs en local, le code principal importe les fonctions nécessaires se trouvant dans ce module.
-
-Le but de ce point est de s'assurer que la récupération des arguments et que les bonnes informations sont transmises aux 
-fonctions de calculs.
-
-Ici, il s'agit du fichier src/models/classifier.py
-
-**NB:** json.dumps transforme un dictionnaire en string : json.loads({dict}) = ‘{dict}’; 
-alors que json.loads procède à l'opération inverse : json.loads('{dict}') = {dict}.            
-
-# 3. Packaging
-Dans l'approche "image pre-built" avec l'approche simple, il n'y a pas de packaging spécifiques à faire. Tout est géré
+# 1. Principes
+L'approche "image pre-built" est l'approche simple et il n'y a pas de packaging spécifique à faire. Tout est géré
 par Google car Vertex AI a pour but de centraliser toutes ces opérations afin de rendre le déploiement le plus simple 
 possible.
 
 Toutefois, il y a certaines étapes à suivre :
-    1. Data Registry en fonction du type de données. Ici, il s'agit de données tabulaire
-    2. Construire un modèle qui sera accessible depuis le Model Registry. L'entraînement du modèle peut être suivi dans 
-l'onglet ...
-    3. Déployer le modèle sur un Endpoint. Il s'agit du point d'entrée utilisé pour faire les prédictions. Le Endpoint
-est visible sur la Endpoint Registry.
+
+    1. Les données doivent se trouver dans le **Data Registry** en fonction du type de données. Cela se trouve dans Vertex AI >> Ensemble de données
+(le logo carré avec 4 points dedans). Ici, il s'agit de données tabulaire. Toutefois, des données textuelles, d'images 
+et de vidéos sont également admissibles.
+
+    2. Construire un modèle qui sera accessible depuis le **Model Registry**. L'entraînement du modèle peut être suivi dans 
+l'onglet Vertex AI >> Model Registry (le logo en forme d'ampoule.)
+
+    3. (Optionnel) Déployer le modèle sur un *Endpoint*. Il s'agit du point d'entrée utilisé pour faire les prédictions. Le Endpoint
+est visible sur le **Endpoint Registry** (logo en forme d'ampoule émitrice). Cette étape est nécessaire pour des prédictions en temps réel.
+Néanmoins, une version de prédiction par lot est possible. Auquel cas, il n'est pas nécessaire de faire un déploiement sur un Endpoint. 
+Il suffit de récupérer le modèle et l'utiliser dans le code.
 
 **Attention** : Un Endpoint sera toujours facturé même lorsqu'il n'est pas utilisé.
 
-# 4.A. Faire un entraînement avec Vertex AI
+# 2. Ce qui change avec AI-Platform
+
+Premièrement, il est important de savoir que Vertex AI définit des variables d'environnements :   
+ 1. AIP_DATA_FORMAT : format d'exportation de vl'ensemble de données. Les valeurs possibles incluent jsonl, csv ou bigquery
+ 2. AIP_TRAINING_DATA_URI : URI BigQuery des données d'entraînement ou URI Cloud Storage du fichier de données d'entraînement.
+ 3. AIP_VALIDATION_DATA_URI : URI BigQuery des données de validation ou URI Cloud Storage du fichier de données de validation
+ 4. AIP_TEST_DATA_URI : URI BigQuery des données de test ou URI Cloud Storage du fichier de données de test.
+ 5. AIP_MODEL_DIR : URI Cloud Storage d'un répertoire destiné à enregistrer les artefacts de modèles.
+
+Pour davantage de détails, voir 
+- https://cloud.google.com/python/docs/reference/aiplatform/latest#google.cloud.aiplatform.CustomContainerTrainingJob
+- https://cloud.google.com/vertex-ai/docs/training/using-managed-datasets#access_a_dataset_from_your_training_application
+- https://cloud.google.com/vertex-ai/docs/training/code-requirements?hl=fr#environment-variables
+
+L'utilisation de cette approche implique de choisir :
+- 1 image pré-construite pour l'entraînement, à choisir dans la liste : https://cloud.google.com/vertex-ai/docs/training/pre-built-containers
+- 1 image pré-construite pour les prédictions, à choisir dans la liste : https://cloud.google.com/vertex-ai/docs/predictions/pre-built-containers?hl=fr
+
+Dans cet exemple, elles sont renseignées dans le fichier de configuration. 
+
+Par rapport à la création d'un job AI-Platform, il y a 3 changements principaux :
+
+A. Aucun packaging de code n'est nécessaire.
+
+B. Le script en charge de l'entraînement du modèle doit être "autonome" vis-à-vis de la structure du projet. Seul 
+l'import de packages disponible dans PyPI est admis. Ceux-ci doivent être compatible avec les images choisies. 
+En particulier, cela implique que tout le préprocessing, la création du modèle et son entraînement doivent être écrit dans 
+un **unique script**. 
+
+À noter que les variables environnementales de Vertex-AI ci-dessus doivent être utilisées pour l'enregistrement du modèle
+et la récupération des données.
+
+Dans cet exemple, le script est ```src/models/vertex_classifier.py```
+
+C. Le script ```main.py``` est modifié dans la partie d'entraînement et de prédiction. Pour l'entraînement, il s'agit de :
+    
+- a. supprimer tout ce qui est relatif d'un export vers GCS d'un package de code, 
+- b. créer, si cela n'est pas déjà fait en amont, les données brutes d'entraînements au sein de la Data Registry depuis GCS, 
+- c. créer et entraîner le modèle en lançant un CustomTrainingJob. Le modèle sera enristré dans la Model Registry alors que les
+artefacts d'entraînement seront disponibles dans GCS.
+   
+- d. (optionnel) s'il est prévu de faire des prédictions à la volée, il faut créer un *Endpoint* et, dans un second temps,
+y déployer le modèle. Le déploiement peut prendre plusieurs minutes.
+
+En phase de prédiction, il s'agit, selon le type de prédiction voulu, de récupérer soit le endpoint, soit le modèle avant de récupérer la 
+data et faire des prédictions.
+
+Un exemple open-source peut être trouvé dans https://cloud.google.com/vertex-ai/docs/tutorials/tabular-bq-prediction/create-training-script?hl=fr .
+
+# 3. Entraîner et prédire
+
+## 3.A. Faire un entraînement avec Vertex AI
 Nous voilà prêt pour passer dans le Cloud.
 
-Pour accéder à la console Vertex AI il suffit d’aller sur l’onglet des différentes fonctionnalités de la GCP et 
-cliquer sur Vertex AI. 
+Pour accéder à la console Vertex AI, il suffit d’aller sur l’onglet des différentes fonctionnalités de la GCP et 
+cliquer sur Vertex AI. Les différentes opérations peuvent y être suivies.
 
 Pour lancer une opération d'entraînement, il suffit de lancer la même commande que pour le local, mais en remplaçant le contenu de 
 l’argument d’environnement par la valeur nécessaire. C’est la seule modification à faire. 
 ```
-python3 {CODE_PATH}/src/main.py --task {TASK} --config {PATH_TO_CONFIGURATION_FILE} --env cloud
+python3 {CODE_PATH}/src/main.py --task train --config {PATH_TO_CONFIGURATION_FILE} --env cloud
 ```
-# 4.B. Faire une prédiction avec Vertex AI
+# 3.B. Faire une prédiction avec Vertex AI
 Dans le cadre de prédictions avec un Endpoint, la data **doit être** préprocessée en amont. Il n'est pas possible de le
 faire en cours de prédiction.
 
 Pour une prédiction avec l'Endpoint, il faut procéder aux étapes suivantes : 
-    1.
-    2.
-    3.
+1. Récupérer le endpoint ou le modèle selon le choix du type de prédiction.
+2. Récupérer la data depuis GCS et passer d'un dataframe à une liste de listes.
+3. Compléter le dataframe initial avec le résultat de la prédiction et renvoyer le résultat dans GCS.
+
+# Nettoyage
+Tout Endpoint non-supprimé est facturé. Ainsi, s'il n'y a pas d'intérêts à le garder, il faut le supprimer du Endpoint Registry.
 
 # Pricing 
 https://cloud.google.com/vertex-ai/pricing#europe
