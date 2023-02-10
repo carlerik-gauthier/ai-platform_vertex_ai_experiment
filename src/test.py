@@ -2,26 +2,16 @@ import os
 import sys
 import logging
 import warnings
-import json
-import pickle
 
-from typing import Union
-from copy import deepcopy
-
-import numpy as np
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import KFold
-from sklearn.metrics import mean_squared_error as mse
 from typing import Optional
 from copy import deepcopy
 
 import google.auth as ga
 import google.auth.credentials as auth_credentials
-from google.oauth2 import service_account
 from google.cloud import storage, aiplatform
 
-from gcp_interface.storage_interface import StorageInterface
+from cpr_dir.gcp_interface.storage_interface import StorageInterface
 
 warnings.filterwarnings("ignore", """Your application has authenticated using
 end user credentials""")
@@ -36,6 +26,11 @@ DATA_CONFIG = {'features': {'fixed': ['Pclass', 'Age', 'SibSp', 'Parch'],
                'target_col': 'Survived',
                'passenger_id': 'PassengerId'
                }
+
+# credentials, _ = ga.default()
+before_df = pd.read_csv("/home/carl-erikgauthier/PycharmProjects/template-ai-platform/data/titanic_test.csv")
+df = pd.read_csv("/home/carl-erikgauthier/Downloads/ai_platform_template_dir_exp_2_prediction_titanic_vertex_ai_v2_endpoint.csv")
+print('hi')
 
 def aip_data_to_dataframe(wild_card_path: str, project_name: str):
     # see https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/sdk/SDK_End_to_End_Tabular_Custom_Training.ipynb
@@ -105,7 +100,7 @@ print(get_model_ids(project="dmp-y-tests",
 def preprocess_titanic_test_file(application_data: pd.DataFrame,
                                  data_configuration: dict
                                  ) -> pd.DataFrame:
-    from preprocessing.titanic_preprocess import preprocess
+    from cpr_dir.preprocessing import preprocess
 
     # preprocess
     feat_dict = data_configuration.get('features')
@@ -158,7 +153,3 @@ storage_interface.dataframe_to_storage(bucket_name='dmp-y-tests_vertex_ai_bucket
 
 #df = storage_interface.storage_to_dataframe(bucket_name=bucket_name, gs_dir_path=dir_path, data_name=core_wildcard_parts[-1])
 #df.head()
-
-model_dir="gs://dmp-y-tests_vertex_ai_bucket/custom_python_package/vertex_exp/jobs/aiplatform-custom-training-2023-01-19-10:19:25.524/model"
-storage_dir_path = '/'.join(model_dir.replace("gs://", '').split('/')[1:])
-print(storage_dir_path)
