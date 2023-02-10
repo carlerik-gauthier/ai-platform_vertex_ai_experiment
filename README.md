@@ -59,11 +59,7 @@ Ici, ces arguments s'appellent env et endpoint_version.
 
 **D.** Installer google-cloud-aiplatform[prediction]>=1.16.0 ```pip install google-cloud-aiplatform[prediction]>=1.16.0```
 
-Pour cet exemple, le bucket est *dmp-y-test_vertex_ai_bucket* et le directory de ce projet est 
-*ai_platform_template_dir_exp_2*.
-
 De plus, nous **supposons** qu'un modèle (et son préprocesseur) est déjà entrainé et que ses artefacts sont disponible dans GCS. 
-Dans cet exemple, ils se trouvent dans *dmp-y-test_vertex_ai_bucket/ai_platform_template_dir_exp_2/cpr_model_artifact*
 
 # 1. Le prédicateur
 ### A. Why ?
