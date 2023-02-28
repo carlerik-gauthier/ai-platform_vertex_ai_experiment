@@ -30,6 +30,7 @@
 - https://cloud.google.com/vertex-ai/docs/training/code-requirements?hl=fr
 - https://cloud.google.com/vertex-ai/docs/predictions/custom-container-requirements
 
+- https://github.com/GoogleCloudPlatform/training-data-analyst/tree/master/self-paced-labs/vertex-ai/vertex-ai-qwikstart
 
 Pipelines
 - https://cloud.google.com/blog/topics/developers-practitioners/using-vertex-ai-rapid-model-prototyping-and-deployment?hl=en 
